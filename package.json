@@ -1,0 +1,28 @@
+{
+  "name": "mongodemo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "word-install": "cnpm install --prefix word_press",
+    "start": "node app.js",
+    "word": "npm start --prefix word_press",
+    "server": "nodemon app",
+    "dev": "concurrently \"npm run server\" \"npm run word\"",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.0.0",
+    "body-parser": "^1.19.0",
+    "express": "^4.17.1",
+    "gravatar": "^1.8.1",
+    "jsonwebtoken": "^8.5.1",
+    "mongodb": "^3.5.9",
+    "mongoose": "^5.9.27",
+    "passport": "^0.4.1",
+    "passport-jwt": "^4.0.0"
+  }
+}
