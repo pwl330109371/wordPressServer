@@ -12,12 +12,16 @@ const Schema = mongoose.Schema
  * String, Number, Boolean | Bool, Array, Buffer, Date, ObjectId | Oid, Mixed
 */
 const ArticleSchema = new Schema({
-  title: {
+  title: {  // 标题
     type: String,
     required: true
   },
   author: { // 作者
     type: String,
+    required: true
+  },
+  authorInfo: { // 作者信息
+    type: Object,
     required: true
   },
   articleImg: { // 封面
@@ -30,7 +34,7 @@ const ArticleSchema = new Schema({
     type: String,
     required: true,
   },
-  date: {
+  date: { // 时间
     type: Date,
     default: Date.now
   }

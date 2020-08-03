@@ -98,7 +98,8 @@ router.get('/current', passport.authenticate('jwt', {session: false}), (req, res
   res.json({
     id: req.user.id,
     name: req.user.name,
-    identity: req.user.identity
+    identity: req.user.identity,
+    avatar: req.user.avatar
   })
 })
 
