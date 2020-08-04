@@ -57,13 +57,13 @@ router.put('/edit', passport.authenticate('jwt', {session: false}), (req, res) =
 // route GET api/acticle/list
 // @desc 获取所有的信息
 // @access Private
-router.get('/list', passport.authenticate('jwt', {session: false}), (req, res) => {
+router.get('/list', (req, res) => {
   Article.find()
     .then(acticle => {
       if(!acticle) {
         return res.status(404)
       }
-      res.json(acticle)
+      res.status(200).json(acticle)
     })
     .catch(err => res.status(404).json(err))   
 })
