@@ -21,7 +21,7 @@ module.exports = passport => {
           if(user) {
             return done(null, user)
           }
-          return done(null , false)
+          return done(null , '9999')
         }).catch((err) => console.log(err))
   }))
 }

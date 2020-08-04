@@ -57,13 +57,38 @@ router.put('/edit', passport.authenticate('jwt', {session: false}), (req, res) =
 // route GET api/acticle/list
 // @desc 获取所有的信息
 // @access Private
-router.get('/list', passport.authenticate('jwt', {session: false}), (req, res) => {
+router.post('/list', (req, res) => {
+  let pageSize = req.body.pageSize || 20  // 分页参数
+  let currentPage = req.body.currentPage || 1 // 当前的页码
+  let params = {
+    // 查询条件参数
+    keyword: req.body.keyword,
+    tag: req.body.tag
+  }
+  let mp = {}
+  for (let i in params) {
+    if(params[i] != undefined) {
+      mp[i] = params[i]
+    }
+  }
   Article.find()
     .then(acticle => {
       if(!acticle) {
         return res.status(404)
       }
-      res.json(acticle)
+      let count = acticle.length // 数量总长度
+      console.log('count', count)
+      Article.find({...mp}).skip((parseInt(currentPage)-1)*parseInt(pageSize)).limit(parseInt(pageSize)).exec((err, docs) => {
+        if (err) {
+          return res.status(200).json({state: 1,msg: '请求失败'})
+        }
+        res.json({
+          state: 200,
+          msg: '操作成功',
+          total: count,
+          list: docs
+        })
+      })
     })
     .catch(err => res.status(404).json(err))   
 })
@@ -79,7 +104,7 @@ router.get('/detail', passport.authenticate('jwt', {session: false}), (req, res)
       }
       res.json(acticle)
     })
-    .catch(err => res.status(404).json(err))   
+    .catch(err => res.status(404).json(err))
 })
 
 // route DELETE apo/acticle/delete
@@ -92,6 +117,6 @@ router.delete('/delete/:id', passport.authenticate('jwt', {session: false}), (re
       acticle.save().then(acticle => res.json(acticle))
       res.status(200).json(acticle)
     })
-    .catch(err => res.status(404).json('删除失败'))   
+    .catch(err => res.status(404).json('删除失败'))
 })
 module.exports = router
