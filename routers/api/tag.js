@@ -35,6 +35,7 @@ router.post('/add', passport.authenticate('jwt', {session: false}), (req, res) =
 router.post('/addChild', passport.authenticate('jwt', {session: false}), (req, res) => {
   const tags = {};
   if (req.body.name) tags.name = req.body.name
+  if (req.body._personId) tags._personId = req.body._personId
   new TagChild(tags).save().then(tag => {
     res.json(tag)
   })
@@ -63,8 +64,8 @@ router.post('/list', (req, res) => {
 // route GET api/acticle/list
 // @desc 获取所有的信息
 // @access Private
-router.post('/tagChildList', (req, res) => {
-  TagChild.find({personId:req.body.id})
+router.get('/getTagChildList', (req, res) => {
+  TagChild.find({_personId:req.query.personId})
     .then(tags => {
       if(!tags) {
         return res.status(404)

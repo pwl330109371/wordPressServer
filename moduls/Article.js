@@ -20,6 +20,10 @@ const ArticleSchema = new Schema({
     type: String,
     required: true
   },
+  tagLsi: { // 标签
+    type: Array,
+    required: true
+  },
   authorInfo: { // 作者信息
     type: Object,
     required: true

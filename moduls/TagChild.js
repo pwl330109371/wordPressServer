@@ -16,9 +16,11 @@ const TagChildSchema = new Schema({
     type: String,
     required: true
   },
-  _personId: { // 父亲id
-    type: Schema.Types.ObjectId,
+  _personId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'tags',  // 这里即为子表的外键，关联主表。  ref后的blog代表的是主表blog的Model。
+    required: true
   }
-},{ _personId: false })
+})
 
 module.exports = tagsChild = mongoose.model('tagsChilds', TagChildSchema)
