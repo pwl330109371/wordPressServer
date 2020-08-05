@@ -25,6 +25,7 @@ router.post('/add', passport.authenticate('jwt', {session: false}), (req, res) =
   if (req.body.author) acticleFields.author = req.body.author
   if (req.body.articleImg) acticleFields.articleImg = req.body.articleImg
   if (req.body.content) acticleFields.content = req.body.content
+  if (req.body.tagList) acticleFields.tagList = req.body.tagList
    // 插入用户信息
   acticleFields.authorInfo = {
     name: req.user.name,

@@ -20,7 +20,7 @@ const ArticleSchema = new Schema({
     type: String,
     required: true
   },
-  tagLsi: { // 标签
+  tagList: { // 标签
     type: Array,
     required: true
   },
