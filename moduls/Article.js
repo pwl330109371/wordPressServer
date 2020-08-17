@@ -38,10 +38,15 @@ const ArticleSchema = new Schema({
     type: String,
     required: true,
   },
+  count: {  // 阅读数量
+    type: Number,
+    default: 0
+  },
   date: { // 时间
     type: Date,
     default: Date.now
-  }
+  },
+  
 })
 
 module.exports = article = mongoose.model('articles', ArticleSchema)
