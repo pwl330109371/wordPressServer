@@ -33,7 +33,11 @@ router.post('/add', passport.authenticate('jwt', {session: false}), (req, res) =
     avatar: req.user.avatar
   }
   new Article(acticleFields).save().then(acticle => {
-    res.json(acticle)
+    res.json({
+      state: 200,
+      msg: '操作成功',
+      data: acticle
+    })
   })
 })
 
@@ -79,7 +83,7 @@ router.post('/list', (req, res) => {
       }
       let count = acticle.length // 数量总长度
       console.log('count', count)
-      Article.find({...mp}).skip((parseInt(currentPage)-1)*parseInt(pageSize)).limit(parseInt(pageSize)).exec((err, docs) => {
+      Article.find({...mp}).sort({'date':-1}).skip((parseInt(currentPage)-1)*parseInt(pageSize)).limit(parseInt(pageSize)).exec((err, docs) => {
         if (err) {
           return res.status(200).json({state: 1,msg: '请求失败'})
         }
@@ -103,6 +107,11 @@ router.get('/detail', passport.authenticate('jwt', {session: false}), (req, res)
       if(!acticle) {
         return res.status(404)
       }
+      // Article.updateOne({_id: req.query.id}, {count:count}, (err, data) => {
+      //   console.log(data);
+      // })
+      Article.findByIdAndUpdate({ _id: req.query.id }, { $inc: { count: 1 } }, { new: true, upsert: true }, function (error, counter) {
+      });
       res.json(acticle)
     })
     .catch(err => res.status(404).json(err))
