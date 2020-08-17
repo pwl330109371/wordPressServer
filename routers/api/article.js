@@ -97,7 +97,7 @@ router.post('/list', (req, res) => {
 // route GET apo/acticle/
 // @desc 获取单个的信息
 // @access Private
-router.get('/detail', passport.authenticate('jwt', {session: false}), (req, res) => {
+router.get('/detail', (req, res) => {
   Article.findOne({_id: req.query.id})
     .then(acticle => {
       if(!acticle) {
