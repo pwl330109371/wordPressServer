@@ -24,6 +24,10 @@ const upload = require('./routers/api/upload')
 // 引入tag.js
 const tag = require('./routers/api/tag')
 
+// 引入follow.js
+const follow = require('./routers/api/follow')
+
+
 // 创建 application/x-www-form-urlencoded 编码解析
 app.use(bodyParser.urlencoded({ extended: false }))  
 // parse application/json  
@@ -54,6 +58,8 @@ app.use('/api/profile', profile)
 app.use('/api/article', article)
 app.use('/api/file', upload)
 app.use('/api/tag', tag)
+app.use('/api/follow', follow)
+
 
 const server = app.listen(3000, ()=> {
   let host = server.address().address
