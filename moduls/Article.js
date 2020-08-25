@@ -46,6 +46,10 @@ const ArticleSchema = new Schema({
     type: Date,
     default: Date.now
   },
+  isFollow: { // 是否关注
+    type: Boolean,
+    default: false
+  }
   
 })
 

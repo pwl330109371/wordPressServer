@@ -6,6 +6,8 @@ const passport = require('passport')     // 验证token
 
 const Article = require('../../moduls/Article')
 
+const Follow = require('../../moduls/Follow')
+
 // route GET api/acticle/test
 // @desc 返回请求的json数据
 // @access public
@@ -101,7 +103,7 @@ router.post('/list', (req, res) => {
 // route GET apo/acticle/
 // @desc 获取单个的信息
 // @access Private
-router.get('/detail', (req, res) => {
+router.get('/detail',passport.authenticate('jwt', {session: false}), (req, res) => {
   Article.findOne({_id: req.query.id})
     .then(acticle => {
       if(!acticle) {
@@ -110,9 +112,22 @@ router.get('/detail', (req, res) => {
       // Article.updateOne({_id: req.query.id}, {count:count}, (err, data) => {
       //   console.log(data);
       // })
-      Article.findByIdAndUpdate({ _id: req.query.id }, { $inc: { count: 1 } }, { new: true, upsert: true }, function (error, counter) {
-      });
-      res.json(acticle)
+      console.log(acticle.authorInfo.id);
+
+      Follow.find({userId: acticle.authorInfo.id}).then((data) => {
+        if (data.length > 0 && data != null) {
+          let userId = req.user.id
+          let followList = data[0].followList
+          followList.indexOf(userId) >= 0 ? acticle.isFollow = true : false
+          console.log(acticle.isFollow);
+        } else {
+          acticle.isFollow = false
+        }
+        console.log(acticle);
+        Article.findByIdAndUpdate({ _id: req.query.id }, { $inc: { count: 1 } }, { new: true, upsert: true }, function (error, counter) {});
+        res.json(acticle)
+      })
+
     })
     .catch(err => res.status(404).json(err))
 })
@@ -121,7 +136,7 @@ router.get('/detail', (req, res) => {
 // @desc 获取单个的信息
 // @access Private
 router.delete('/delete/:id', passport.authenticate('jwt', {session: false}), (req, res) => {
-
+  const userId = req.user.id
   Article.findByIdAndRemove({_id:req.params.id})
     .then(acticle => {
       acticle.save().then(acticle => res.json(acticle))
