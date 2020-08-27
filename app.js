@@ -27,6 +27,8 @@ const tag = require('./routers/api/tag')
 // 引入follow.js
 const follow = require('./routers/api/follow')
 
+// 引入praise.js
+const praise = require('./routers/api/praise')
 
 // 创建 application/x-www-form-urlencoded 编码解析
 app.use(bodyParser.urlencoded({ extended: false }))  
@@ -59,6 +61,7 @@ app.use('/api/article', article)
 app.use('/api/file', upload)
 app.use('/api/tag', tag)
 app.use('/api/follow', follow)
+app.use('/api/praise', praise)
 
 
 const server = app.listen(3000, ()=> {
