@@ -6,6 +6,8 @@ const passport = require('passport')     // 验证token
 
 const Praise = require('../../moduls/praise')
 
+const Article = require('../../moduls/Article')
+
 
 // route GET api/floow/test
 // @desc 返回请求的json数据
@@ -22,6 +24,7 @@ router.get('/test', (req, res) => {
 router.post('/addPraise', passport.authenticate('jwt', {session: false}), (req, res) => {
 // router.post('/isFollow', (req, res) => {
 
+  // Praise.remove({articleId: req.body.articleId})
   const praiseObj = {};
   if (req.body.articleId) praiseObj.articleId = req.body.articleId // 点赞的文章ID
   if (req.user.id) praiseObj.userId = req.user.id // 当前用户自己的id
@@ -32,14 +35,17 @@ router.post('/addPraise', passport.authenticate('jwt', {session: false}), (req, 
     console.log('res', data);
     if(data != null && data.length > 0) {
       const praiseList = data[0].praiseList
-      let inx = praiseList.indexOf(req.userId)
+      let inx = praiseList.indexOf(req.user.id)
       if(inx < 0) {
-        praiseList.push(req.body.userId)
+        praiseList.push(req.user.id)
         Praise.update({articleId: req.body.articleId},{$set:{'praiseList': praiseList}}).then(()=>{
+         Article.findByIdAndUpdate({ _id: req.body.articleId }, { $inc: { praiseCount: 1 } }, { new: true, upsert: true }, function (error, counter) {}).then(() => {
           res.json({
             state: 200,
             msg: '操作成功！'
           })
+         })
+
         })
       } else {
         // 存在
@@ -51,6 +57,7 @@ router.post('/addPraise', passport.authenticate('jwt', {session: false}), (req, 
       console.log(inx);
     } else {
       new Praise(praiseObj).save().then(praiseObj => {
+        Article.findByIdAndUpdate({ _id: req.body.articleId }, { $inc: { praiseCount: 1 } }, { new: true, upsert: true }, function (error, counter) {})
         res.json(praiseObj)
       })
     }
@@ -76,6 +83,7 @@ router.post('/canclPraise', passport.authenticate('jwt', {session: false}), (req
           console.log('newpraiseList', praiseList);
           
           Praise.updateOne({articleId: req.body.articleId},{$set:{'praiseList':praiseList}}).then(() => {
+            Article.findByIdAndUpdate({ _id: req.body.articleId }, { $inc: { praiseCount: -1 } }, { new: true, upsert: true }, function (error, counter) {});
             res.json({
               state: 200,
               msg: '操作成功！'
@@ -89,9 +97,7 @@ router.post('/canclPraise', passport.authenticate('jwt', {session: false}), (req
           })
         }
       } else {
-        // new Follow(followObj).save().then(followObj => {
-        //   res.json(followObj)
-        // })
+
       }
     })
   })

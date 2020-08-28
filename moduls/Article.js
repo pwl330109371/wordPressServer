@@ -42,11 +42,19 @@ const ArticleSchema = new Schema({
     type: Number,
     default: 0
   },
+  praiseCount: { // 点赞数量
+    type: Number,
+    default: 0
+  },
   date: { // 时间
     type: Date,
     default: Date.now
   },
   isFollow: { // 是否关注
+    type: Boolean,
+    default: false
+  },
+  isPraise: { // 是否点赞
     type: Boolean,
     default: false
   }
