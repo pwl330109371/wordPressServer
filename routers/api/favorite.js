@@ -31,28 +31,33 @@ router.post('/addFavorite', passport.authenticate('jwt', {session: false}), (req
   Favorite.find({userId: req.user.id}).then((data) => {
     console.log('res', data);
     if(data != null && data.length > 0) {
-      const FavoriteList = data[0].FavoriteList
-      let inx = FavoriteList.indexOf(req.body.articleId)
-      if(inx < 0) {
-        FavoriteList.push(req.body.articleId)
-        Favorite.update({userId: req.user.id},{$set:{'FavoriteList':FavoriteList}}).then(()=>{
+      const FavoriteList = data[0].favoriteList
+      console.log();
+      if(FavoriteList.length > 0) {
+        let inx = FavoriteList.indexOf(req.body.articleId)
+
+        if(inx < 0) {
+          FavoriteList.push(req.body.articleId)
+          Favorite.update({userId: req.user.id},{$set:{'favoriteList':FavoriteList}}).then(()=>{
+            res.json({
+              state: 200,
+              msg: '操作成功！'
+            })
+          })
+        } else {
+          // 存在
           res.json({
             state: 200,
-            msg: '操作成功！'
+            msg: '已收藏！'
           })
-        })
-      } else {
-        // 存在
-        res.json({
-          state: 200,
-          msg: '已收藏！'
-        })
+        }
+        console.log(inx);
       }
-      console.log(inx);
+ 
     } else {
-        new Favorite(FavoriteObj).save().then(FavoriteObj => {
-          res.json(FavoriteObj)
-        })
+      new Favorite(FavoriteObj).save().then(FavoriteObj => {
+        res.json(FavoriteObj)
+      })
     }
   })
 })

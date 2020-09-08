@@ -157,4 +157,17 @@ router.delete('/delete/:id', passport.authenticate('jwt', {session: false}), (re
     .catch(err => res.status(404).json('删除失败'))
 })
 
+// route DELETE apo/acticle/delete
+// @desc 获取单个的信息
+// @access Private
+router.get('/myArticle', passport.authenticate('jwt', {session: false}), (req, res) => {
+  const userId = req.user.id
+  Article.find({ "authorInfo.id": userId })
+    .then(acticle => {
+      console.log(acticle);
+      res.status(200).json(acticle)
+    })
+    .catch(err => res.status(404).json('删除失败'))
+})
+
 module.exports = router
