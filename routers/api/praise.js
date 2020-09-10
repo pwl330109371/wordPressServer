@@ -29,16 +29,17 @@ router.post('/addPraise', passport.authenticate('jwt', {session: false}), (req, 
   if (req.body.articleId) praiseObj.articleId = req.body.articleId // 点赞的文章ID
   if (req.user.id) praiseObj.userId = req.user.id // 当前用户自己的id
   console.log(req.user.id);
+  let articleId = req.body.articleId
   praiseObj.praiseList = new Array()
-  praiseObj.praiseList.push(req.user.id)
-  Praise.find({articleId: req.body.articleId}).then((data) => {
+  praiseObj.praiseList.push(articleId)
+  Praise.find({userId: req.user.id}).then((data) => {
     console.log('res', data);
     if(data != null && data.length > 0) {
       const praiseList = data[0].praiseList
-      let inx = praiseList.indexOf(req.user.id)
+      let inx = praiseList.indexOf(req.body.articleId)
       if(inx < 0) {
-        praiseList.push(req.user.id)
-        Praise.update({articleId: req.body.articleId},{$set:{'praiseList': praiseList}}).then(()=>{
+        praiseList.push(req.body.articleId)
+        Praise.update({userId: req.user.id},{$set:{'praiseList': praiseList}}).then(()=>{
          Article.findByIdAndUpdate({ _id: req.body.articleId }, { $inc: { praiseCount: 1 } }, { new: true, upsert: true }, function (error, counter) {}).then(() => {
           res.json({
             state: 200,
@@ -72,17 +73,17 @@ router.post('/canclPraise', passport.authenticate('jwt', {session: false}), (req
   
     const articleId = req.body.articleId // 当前文章发布者的id
     const userId =  req.user.id // 用户自己的id
-    Praise.find({articleId: articleId}).then((data) => {
+    Praise.find({userId: userId}).then((data) => {
       console.log('res', data);
       if(data != null && data.length > 0) {
         const praiseList = data[0].praiseList
-        let inx = praiseList.indexOf(userId)
+        let inx = praiseList.indexOf(articleId)
         if(inx >= 0) {
           // console.log(praiseList.splice(inx, 1));
           praiseList.splice(inx, 1)
           console.log('newpraiseList', praiseList);
           
-          Praise.updateOne({articleId: req.body.articleId},{$set:{'praiseList':praiseList}}).then(() => {
+          Praise.updateOne({userId: userId},{$set:{'praiseList':praiseList}}).then(() => {
             Article.findByIdAndUpdate({ _id: req.body.articleId }, { $inc: { praiseCount: -1 } }, { new: true, upsert: true }, function (error, counter) {});
             res.json({
               state: 200,
@@ -105,13 +106,27 @@ router.post('/canclPraise', passport.authenticate('jwt', {session: false}), (req
 // route get api/follow/list
 // @desc 返回请求的json数据
 // @access Private
-router.get('/list', passport.authenticate('jwt', {session: false}), (req, res) => {
-  Praise.find().then((result) => {
+router.get('/myPraise', passport.authenticate('jwt', {session: false}), (req, res) => {
+  Praise.find({userId: req.user.id}).then((result) => {
     console.log(result);
-    res.json({
-      state: 200,
-      data: result
+    let praiseList = result[0].praiseList 
+    if (praiseList.length === 0) {
+      res.json({
+        state: 200,
+        data: []
+      })
+      return
+    }
+    Article.find({ _id: { $in: praiseList } }).then((data) => {
+      res.json({
+        state: 200,
+        data: data
+      })
+    }).catch(error => {
+      console.log(error);
     })
+
+
   })
 })
 

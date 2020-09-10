@@ -12,7 +12,7 @@ const Schema = mongoose.Schema
  * String, Number, Boolean | Bool, Array, Buffer, Date, ObjectId | Oid, Mixed
 */
 const praiseSchema = new Schema({
-  articleId: {  // 文章
+  userId: { // 用户id
     type: String,
     required: true
   },

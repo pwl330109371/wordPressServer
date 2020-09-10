@@ -6,6 +6,7 @@ const passport = require('passport')     // 验证token
 
 const Favorite = require('../../moduls/Favorite')
 
+const Article = require('../../moduls/Article')
 
 // route GET api/floow/test
 // @desc 返回请求的json数据
@@ -142,13 +143,26 @@ router.get('/isFavorite', passport.authenticate('jwt', {session: false}), (req, 
 // route get api/Favorite/list
 // @desc 返回请求的json数据
 // @access Private
-router.get('/list', passport.authenticate('jwt', {session: false}), (req, res) => {
-  Favorite.find().then((result) => {
+router.get('/myFavorite', passport.authenticate('jwt', {session: false}), (req, res) => {
+  Favorite.find({userId: req.user.id}).then((result) => {
     console.log(result);
-    res.json({
-      state: 200,
-      data: result
+    let favoriteList = result[0].favoriteList
+    if(favoriteList.length === 0) {
+      res.json({
+        state: 200,
+        data: []
+      })
+      return
+    }
+    Article.find({ _id: { $in: favoriteList } }).then((data) => {
+      res.json({
+        state: 200,
+        data: data
+      })
+    }).catch(error => {
+      console.log(error);
     })
+
   })
 })
 
