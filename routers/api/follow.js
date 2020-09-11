@@ -6,6 +6,7 @@ const passport = require('passport')     // 验证token
 
 const Follow = require('../../moduls/Follow')
 
+const User = require('../../moduls/User')
 
 // route GET api/floow/test
 // @desc 返回请求的json数据
@@ -23,20 +24,22 @@ router.post('/addFollow', passport.authenticate('jwt', {session: false}), (req, 
 // router.post('/isFollow', (req, res) => {
 
   const followObj = {};
-  if (req.body.userId) followObj.userId = req.body.authorId // 当前用户自己的id
+  const authorId = req.body.authorId // 当前文章发布者的id
+  const userId =  req.body.userId // 用户自己的id
   followObj.followList = new Array()
-  followObj.followList.push(req.body.userId)
-  // Follow.remove({userId: req.body.authorId}).then((res) => {
-  //   console.log(res);
-  // })
-  Follow.find({userId: req.body.authorId}).then((data) => {
+  followObj.followList.push(authorId)
+
+  Follow.remove({}).then((res) => {
+    console.log(res);
+  })
+  Follow.find({userId: userId}).then((data) => {
     console.log('res', data);
     if(data != null && data.length > 0) {
       const followList = data[0].followList
-      let inx = followList.indexOf(req.body.userId)
+      let inx = followList.indexOf(authorId)
       if(inx < 0) {
-        followList.push(req.body.userId)
-        Follow.update({userId: req.body.authorId},{$set:{'followList':followList}}).then(()=>{
+        followList.push(authorId)
+        Follow.update({userId: userId},{$set:{'followList':followList}}).then(()=>{
           res.json({
             state: 200,
             msg: '操作成功！'
@@ -66,7 +69,7 @@ router.post('/canclFollow', passport.authenticate('jwt', {session: false}), (req
   
     const authorId = req.body.authorId // 当前文章发布者的id
     const userId =  req.body.userId // 用户自己的id
-    Follow.find({userId: authorId}).then((data) => {
+    Follow.find({userId: userId}).then((data) => {
       console.log('res', data);
       if(data != null && data.length > 0) {
         const followList = data[0].followList
@@ -76,7 +79,7 @@ router.post('/canclFollow', passport.authenticate('jwt', {session: false}), (req
           followList.splice(inx, 1)
           console.log('newFollowList', followList);
           
-          Follow.updateOne({userId: req.body.authorId},{$set:{'followList':followList}}).then(() => {
+          Follow.updateOne({userId: userId},{$set:{'followList':followList}}).then(() => {
             res.json({
               state: 200,
               msg: '操作成功！'
@@ -100,12 +103,24 @@ router.post('/canclFollow', passport.authenticate('jwt', {session: false}), (req
 // route get api/follow/list
 // @desc 返回请求的json数据
 // @access Private
-router.get('/list', passport.authenticate('jwt', {session: false}), (req, res) => {
-  Follow.find().then((result) => {
+router.get('/myFollow', passport.authenticate('jwt', {session: false}), (req, res) => {
+  Follow.find({userId:req.user.id}).then((result) => {
     console.log(result);
-    res.json({
-      state: 200,
-      data: result
+    let followList = result[0].followList
+    if(followList.length === 0) {
+      res.json({
+        state: 200,
+        data: followList
+      })
+      return
+    }
+    User.find({ _id: { $in: followList } }).then((data) => {
+      res.json({
+        state: 200,
+        data: data
+      })
+    }).catch(error => {
+      console.log(error);
     })
   })
 })
