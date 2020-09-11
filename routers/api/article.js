@@ -8,8 +8,6 @@ const Article = require('../../moduls/Article')
 
 const Follow = require('../../moduls/Follow')
 
-const Praise = require('../../moduls/praise')
-
 // route GET api/acticle/test
 // @desc 返回请求的json数据
 // @access public
@@ -115,6 +113,7 @@ router.get('/detail',passport.authenticate('jwt', {session: false}), (req, res) 
       //   console.log(data);
       // })
       console.log(acticle.authorInfo.id);
+
       Follow.find({userId: acticle.authorInfo.id}).then((data) => {
         if (data.length > 0 && data != null) {
           let userId = req.user.id
@@ -124,20 +123,9 @@ router.get('/detail',passport.authenticate('jwt', {session: false}), (req, res) 
         } else {
           acticle.isFollow = false
         }
-        Praise.find({articleId:  req.query.id}).then((list) => {
-          if (list.length > 0 && list != null) {
-            let userId = req.user.id
-            let praiseList = list[0].praiseList
-            praiseList.indexOf(userId) >= 0 ? acticle.isPraise = true : false
-            console.log(acticle.isPraise);
-          } else {
-            acticle.isPraise = false
-          }
-          console.log(acticle);
-          Article.findByIdAndUpdate({ _id: req.query.id }, { $inc: { count: 1 } }, { new: true, upsert: true }, function (error, counter) {});
-          res.json(acticle)
-        })
-
+        console.log(acticle);
+        Article.findByIdAndUpdate({ _id: req.query.id }, { $inc: { count: 1 } }, { new: true, upsert: true }, function (error, counter) {});
+        res.json(acticle)
       })
 
     })

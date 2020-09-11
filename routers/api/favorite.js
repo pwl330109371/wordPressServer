@@ -21,9 +21,7 @@ router.get('/test', (req, res) => {
 // @access Private
 router.post('/addFavorite', passport.authenticate('jwt', {session: false}), (req, res) => {
 // router.post('/isFavorite', (req, res) => {
-
   const FavoriteObj = {};
-  console.log(req.user.id);
   FavoriteObj.userId = req.user.id // 当前用户自己的id
   FavoriteObj.favoriteList = new Array()
   FavoriteObj.favoriteList.push(req.body.articleId)
@@ -129,8 +127,6 @@ router.get('/isFavorite', passport.authenticate('jwt', {session: false}), (req, 
             }
         })
       }
-
-
     })
   })
 
@@ -146,53 +142,5 @@ router.get('/list', passport.authenticate('jwt', {session: false}), (req, res) =
     })
   })
 })
-
-// 2020-04-02
-
-// 2020-08-25
-// // route GET api/acticle/list
-// // @desc 获取所有的信息
-// // @access Private
-// router.post('/list', (req, res) => {
-//   Tag.find()
-//     .then(tags => {
-//       if(!tags) {
-//         return res.status(404)
-//       }
-// 			res.json({
-// 					state: 200,
-// 					msg: '操作成功',
-// 					data: tags
-// 			})
-
-//     })
-//     .catch(err => res.status(404).json(err))   
-// })
-
-/**
- * 
- * 
- * 
-*/
-
-// // route GET api/acticle/list
-// // @desc 获取所有的信息
-// // @access Private
-// router.get('/getTagChildList', (req, res) => {
-//   TagChild.find({_personId:req.query.personId})
-//     .then(tags => {
-//       if(!tags) {
-//         return res.status(404)
-//       }
-// 			res.json({
-// 					state: 200,
-// 					msg: '操作成功',
-// 					data: tags
-// 			})
-
-//     })
-//     .catch(err => res.status(404).json(err))   
-// })
-
 
 module.exports = router
