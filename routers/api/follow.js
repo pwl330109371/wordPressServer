@@ -17,6 +17,29 @@ router.get('/test', (req, res) => {
   })
 })
 
+
+// // 关注某人
+// router.post('/addFollow', passport.authenticate('jwt', {session: false}), (req, res) => {
+  
+//   // 当前请求 id
+//   const { id } = req.params.id
+
+//   // token 中存放的 id
+//   const { _id } = ctx.user.id
+
+//   if (id === _id) { ctx.throw(400, '自己不能关注自己~!') }
+  
+//   const me = User.findById(_id).select('+following')
+
+//   if (!me.following.map(id => id.toString()).includes(id)) {
+//     // 未关注
+//     me.following.push(id)
+//     me.save()
+//     ctx.body = { code: 0, message: '关注成功' }
+//   }
+// }
+
+
 // route POST api/follow/addFollow
 // @desc 关注
 // @access Private
@@ -25,7 +48,8 @@ router.post('/addFollow', passport.authenticate('jwt', {session: false}), (req, 
 
   const followObj = {};
   const authorId = req.body.authorId // 当前文章发布者的id
-  const userId =  req.body.userId // 用户自己的id
+  const userId =  req.user.id // 用户自己的id
+  followObj.userId = userId
   followObj.followList = new Array()
   followObj.followList.push(authorId)
 
@@ -73,7 +97,7 @@ router.post('/canclFollow', passport.authenticate('jwt', {session: false}), (req
       console.log('res', data);
       if(data != null && data.length > 0) {
         const followList = data[0].followList
-        let inx = followList.indexOf(userId)
+        let inx = followList.indexOf(authorId)
         if(inx >= 0) {
           // console.log(followList.splice(inx, 1));
           followList.splice(inx, 1)
@@ -125,6 +149,33 @@ router.get('/myFollow', passport.authenticate('jwt', {session: false}), (req, re
   })
 })
 
+// route get api/follow/list
+// @desc 返回请求的json数据
+// @access Private
+router.get('/myFens', passport.authenticate('jwt', {session: false}), (req, res) => {
+  let userId = req.user.id
+
+  // const user = await User.find({following: ctx.params.id})
+  Follow.find({followList: userId}).then((result) => {
+    console.log(result);
+    // let followList = result[0].followList
+    // if(followList.length === 0) {
+    //   res.json({
+    //     state: 200,
+    //     data: followList
+    //   })
+    //   return
+    // }
+    // User.find({ _id: userId}).then((data) => {
+    //   res.json({
+    //     state: 200,
+    //     data: data
+    //   })
+    // }).catch(error => {
+    //   console.log(error);
+    // })
+  })
+})
 // 2020-04-02
 
 // 2020-08-25
