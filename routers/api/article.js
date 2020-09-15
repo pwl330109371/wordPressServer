@@ -148,8 +148,8 @@ router.delete('/delete/:id', passport.authenticate('jwt', {session: false}), (re
 // route DELETE apo/acticle/delete
 // @desc 获取单个的信息
 // @access Private
-router.get('/myArticle', passport.authenticate('jwt', {session: false}), (req, res) => {
-  const userId = req.user.id
+router.get('/myArticle', (req, res) => {
+  const userId = req.query.id
   Article.find({ "authorInfo.id": userId })
     .then(acticle => {
       console.log(acticle);

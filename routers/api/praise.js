@@ -103,12 +103,57 @@ router.post('/canclPraise', passport.authenticate('jwt', {session: false}), (req
     })
   })
 
+  // route get api/Favorite/list
+// @desc 返回请求的json数据
+// @access Private
+router.get('/isPraise', passport.authenticate('jwt', {session: false}), (req, res) => {
+  let userId = req.user.id
+  let articleId = req.query.articleId
+  Praise.find({userId: userId}).then((result) => {
+    if(result.length > 0) {
+       let praiseList = result[0].praiseList
+      let inx = praiseList.indexOf(articleId)
+      if(inx >= 0) {
+        res.json({
+            state: 200,
+            data: {
+                state:1
+            }
+        })
+      } else {
+        res.json({
+            state: 200,
+            data: {
+                state:2
+            }
+        })
+      }
+    } else {
+      res.json({
+          state: 200,
+          data: {
+              state:2
+          }
+      })
+    }
+  })
+})
+
+
 // route get api/follow/list
 // @desc 返回请求的json数据
 // @access Private
-router.get('/myPraise', passport.authenticate('jwt', {session: false}), (req, res) => {
-  Praise.find({userId: req.user.id}).then((result) => {
+router.get('/myPraise', (req, res) => {
+  let userId = req.query.userId
+  Praise.find({userId: userId}).then((result) => {
     console.log(result);
+    if(result.length === 0) {
+      res.json({
+        state: 200,
+        data: []
+      })
+      return
+    }
     let praiseList = result[0].praiseList 
     if (praiseList.length === 0) {
       res.json({

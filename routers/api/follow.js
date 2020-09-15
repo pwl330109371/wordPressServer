@@ -53,9 +53,9 @@ router.post('/addFollow', passport.authenticate('jwt', {session: false}), (req, 
   followObj.followList = new Array()
   followObj.followList.push(authorId)
 
-  Follow.remove({}).then((res) => {
-    console.log(res);
-  })
+  // Follow.remove({}).then((res) => {
+  //   console.log(res);
+  // })
   Follow.find({userId: userId}).then((data) => {
     console.log('res', data);
     if(data != null && data.length > 0) {
@@ -79,7 +79,10 @@ router.post('/addFollow', passport.authenticate('jwt', {session: false}), (req, 
       console.log(inx);
     } else {
       new Follow(followObj).save().then(followObj => {
-        res.json(followObj)
+        res.json({
+          state:200,
+          data:followObj
+        })
       })
     }
   })
@@ -91,45 +94,92 @@ router.post('/addFollow', passport.authenticate('jwt', {session: false}), (req, 
 router.post('/canclFollow', passport.authenticate('jwt', {session: false}), (req, res) => {
   // router.post('/isFollow', (req, res) => {
   
-    const authorId = req.body.authorId // 当前文章发布者的id
-    const userId =  req.body.userId // 用户自己的id
-    Follow.find({userId: userId}).then((data) => {
-      console.log('res', data);
-      if(data != null && data.length > 0) {
-        const followList = data[0].followList
-        let inx = followList.indexOf(authorId)
-        if(inx >= 0) {
-          // console.log(followList.splice(inx, 1));
-          followList.splice(inx, 1)
-          console.log('newFollowList', followList);
-          
-          Follow.updateOne({userId: userId},{$set:{'followList':followList}}).then(() => {
-            res.json({
-              state: 200,
-              msg: '操作成功！'
-            })
-          })
-        } else {
-          // 存在
+  const authorId = req.body.authorId // 当前文章发布者的id
+  const userId =  req.user.id // 用户自己的id
+  Follow.find({userId: userId}).then((data) => {
+    console.log('res', data);
+    if(data != null && data.length > 0) {
+      const followList = data[0].followList
+      let inx = followList.indexOf(authorId)
+      if(inx >= 0) {
+        // console.log(followList.splice(inx, 1));
+        followList.splice(inx, 1)
+        console.log('newFollowList', followList);
+        
+        Follow.updateOne({userId: userId},{$set:{'followList':followList}}).then(() => {
           res.json({
             state: 200,
-            msg: '操作失败！'
+            msg: '操作成功！'
           })
-        }
+        })
       } else {
-        // new Follow(followObj).save().then(followObj => {
-        //   res.json(followObj)
-        // })
+        // 存在
+        res.json({
+          state: 200,
+          msg: '操作失败！'
+        })
       }
-    })
+    } else {
+      // new Follow(followObj).save().then(followObj => {
+      //   res.json(followObj)
+      // })
+    }
   })
+})
+
+// route get api/isFollow/list
+// @desc 返回请求的json数据
+// @access Private
+router.get('/isFollow', passport.authenticate('jwt', {session: false}), (req, res) => {
+  let userId = req.user.id
+  let authorId = req.query.authorId
+  console.log('authorId', authorId);
+  Follow.find({userId: userId}).then((result) => {
+    console.log('result', result);
+    if(result.length > 0) {
+       let followList = result[0].followList
+      let inx = followList.indexOf(authorId)
+      console.log('inx', inx);
+      if(inx >= 0) {
+        res.json({
+            state: 200,
+            data: {
+                state:1
+            }
+        })
+      } else {
+        res.json({
+            state: 200,
+            data: {
+                state:2
+            }
+        })
+      }
+    } else {
+      res.json({
+          state: 200,
+          data: {
+              state:2
+          }
+      })
+    }
+  })
+})
 
 // route get api/follow/list
 // @desc 返回请求的json数据
 // @access Private
-router.get('/myFollow', passport.authenticate('jwt', {session: false}), (req, res) => {
-  Follow.find({userId:req.user.id}).then((result) => {
+router.get('/myFollow', (req, res) => {
+  const userId = req.query.id
+  Follow.find({userId:userId}).then((result) => {
     console.log(result);
+    if(result.length === 0) {
+      res.json({
+        state: 200,
+        data: []
+      })
+      return
+    }
     let followList = result[0].followList
     if(followList.length === 0) {
       res.json({

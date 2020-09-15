@@ -72,7 +72,7 @@ router.post('/canclFavorite', passport.authenticate('jwt', {session: false}), (r
     Favorite.find({userId: userId}).then((data) => {
       console.log('res', data);
       if(data != null && data.length > 0) {
-        const FavoriteList = data[0].FavoriteList
+        const FavoriteList = data[0].favoriteList
         let inx = FavoriteList.indexOf(articleId)
         if(inx >= 0) {
           // console.log(FavoriteList.splice(inx, 1));
@@ -139,9 +139,17 @@ router.get('/isFavorite', passport.authenticate('jwt', {session: false}), (req, 
 // route get api/Favorite/list
 // @desc 返回请求的json数据
 // @access Private
-router.get('/myFavorite', passport.authenticate('jwt', {session: false}), (req, res) => {
-  Favorite.find({userId: req.user.id}).then((result) => {
+router.get('/myFavorite', (req, res) => {
+  const userId = req.query.id
+  Favorite.find({userId: userId}).then((result) => {
     console.log(result);
+    if(result.length === 0) {
+      res.json({
+        state: 200,
+        data: []
+      })
+      return
+    }
     let favoriteList = result[0].favoriteList
     if(favoriteList.length === 0) {
       res.json({

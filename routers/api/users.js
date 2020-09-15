@@ -79,6 +79,7 @@ router.post('/login', (req, res) => {
                     res.json({
                       success: true,
                       state: 200,
+                      userId: user.id,
                       token: 'Bearer ' + token  // 名字一定要是Bearer 才能生效
                     })
                   })
@@ -94,12 +95,12 @@ router.post('/login', (req, res) => {
 // @desc return current user
 // @access private
 // 验证token 返回用户信息
-router.get('/current', passport.authenticate('jwt', {session: false}), (req, res) => {
-  res.json({
-    id: req.user.id,
-    name: req.user.name,
-    identity: req.user.identity,
-    avatar: req.user.avatar
+router.get('/current', (req, res) => {
+  User.findOne({_id: req.query.userId}).then((data) => {
+    console.log('data', data);
+    res.json(data)
+  }).catch(err => {
+    console.log(err);
   })
 })
 
