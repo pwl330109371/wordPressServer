@@ -31,7 +31,7 @@ router.post('/addFavorite', passport.authenticate('jwt', {session: false}), (req
     console.log('res', data);
     if(data != null && data.length > 0) {
       const FavoriteList = data[0].favoriteList
-      console.log();
+      console.log('FavoriteList', FavoriteList);
       if(FavoriteList.length > 0) {
         let inx = FavoriteList.indexOf(req.body.articleId)
 
@@ -51,9 +51,18 @@ router.post('/addFavorite', passport.authenticate('jwt', {session: false}), (req
           })
         }
         console.log(inx);
+      } else {
+        FavoriteList.push(req.body.articleId)
+        Favorite.update({userId: req.user.id},{$set:{'favoriteList':FavoriteList}}).then(()=>{
+          res.json({
+            state: 200,
+            msg: '操作成功！'
+          })
+        })
       }
  
     } else {
+      console.log('FavoriteObj', FavoriteObj);
       new Favorite(FavoriteObj).save().then(FavoriteObj => {
         res.json(FavoriteObj)
       })
@@ -79,7 +88,7 @@ router.post('/canclFavorite', passport.authenticate('jwt', {session: false}), (r
           FavoriteList.splice(inx, 1)
           console.log('newFavoriteList', FavoriteList);
           
-          Favorite.updateOne({userId: req.user.id},{$set:{'FavoriteList':FavoriteList}}).then(() => {
+          Favorite.updateOne({userId: req.user.id},{$set:{'favoriteList':FavoriteList}}).then(() => {
             res.json({
               state: 200,
               msg: '操作成功！'

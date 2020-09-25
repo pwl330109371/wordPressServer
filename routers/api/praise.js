@@ -40,12 +40,17 @@ router.post('/addPraise', passport.authenticate('jwt', {session: false}), (req, 
       if(inx < 0) {
         praiseList.push(req.body.articleId)
         Praise.update({userId: req.user.id},{$set:{'praiseList': praiseList}}).then(()=>{
-         Article.findByIdAndUpdate({ _id: req.body.articleId }, { $inc: { praiseCount: 1 } }, { new: true, upsert: true }, function (error, counter) {}).then(() => {
-          res.json({
-            state: 200,
-            msg: '操作成功！'
-          })
-         })
+        Article.findByIdAndUpdate({ _id: req.body.articleId }, { $inc: { praiseCount: 1 } }, { new: true, upsert: true }, function (error, counter) {})
+        res.json({
+          state: 200,
+          msg: '操作成功！'
+        })
+        //  Article.findByIdAndUpdate({ _id: req.body.articleId }, { $inc: { praiseCount: 1 } }, { new: true, upsert: true }, function (error, counter) {}).then(() => {
+        //   res.json({
+        //     state: 200,
+        //     msg: '操作成功！'
+        //   })
+        //  })
 
         })
       } else {
@@ -55,7 +60,6 @@ router.post('/addPraise', passport.authenticate('jwt', {session: false}), (req, 
           msg: '已点赞！'
         })
       }
-      console.log(inx);
     } else {
       new Praise(praiseObj).save().then(praiseObj => {
         Article.findByIdAndUpdate({ _id: req.body.articleId }, { $inc: { praiseCount: 1 } }, { new: true, upsert: true }, function (error, counter) {})
