@@ -170,7 +170,7 @@ router.get('/isFollow', passport.authenticate('jwt', {session: false}), (req, re
 // @desc 返回请求的json数据
 // @access Private
 router.get('/myFollow', (req, res) => {
-  const userId = req.query.id
+  const userId = req.query.userId
   Follow.find({userId:userId}).then((result) => {
     console.log(result);
     if(result.length === 0) {
