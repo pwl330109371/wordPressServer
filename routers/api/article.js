@@ -132,6 +132,18 @@ router.get('/detail',passport.authenticate('jwt', {session: false}), (req, res) 
     .catch(err => res.status(404).json(err))
 })
 
+// route GET apo/acticle/get
+// @desc 获取单个的信息
+// @access Private
+router.get('/getDetail', (req, res) => {
+  Article.findOne({_id: req.query.id}).then((acticle) => {
+    res.json(acticle)
+  }).catch(Error => {
+    console.log(error);
+  })
+})
+
+
 // route DELETE apo/acticle/delete
 // @desc 获取单个的信息
 // @access Private
@@ -149,7 +161,8 @@ router.delete('/delete/:id', passport.authenticate('jwt', {session: false}), (re
 // @desc 获取单个的信息
 // @access Private
 router.get('/myArticle', (req, res) => {
-  const userId = req.query.id
+  const userId = req.query.userId
+  console.log('userId', userId);
   Article.find({ "authorInfo.id": userId })
     .then(acticle => {
       console.log(acticle);

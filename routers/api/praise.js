@@ -4,7 +4,7 @@ const router = express.Router()
 
 const passport = require('passport')     // 验证token
 
-const Praise = require('../../moduls/praise')
+const Praise = require('../../moduls/Praise')
 
 const Article = require('../../moduls/Article')
 

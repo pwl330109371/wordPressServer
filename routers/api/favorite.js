@@ -34,7 +34,6 @@ router.post('/addFavorite', passport.authenticate('jwt', {session: false}), (req
       console.log('FavoriteList', FavoriteList);
       if(FavoriteList.length > 0) {
         let inx = FavoriteList.indexOf(req.body.articleId)
-
         if(inx < 0) {
           FavoriteList.push(req.body.articleId)
           Favorite.update({userId: req.user.id},{$set:{'favoriteList':FavoriteList}}).then(()=>{
@@ -149,7 +148,7 @@ router.get('/isFavorite', passport.authenticate('jwt', {session: false}), (req, 
 // @desc 返回请求的json数据
 // @access Private
 router.get('/myFavorite', (req, res) => {
-  const userId = req.query.id
+  const userId = req.query.userId
   Favorite.find({userId: userId}).then((result) => {
     console.log(result);
     if(result.length === 0) {

@@ -33,6 +33,9 @@ const praise = require('./routers/api/praise')
 // favorite.js
 const favorite = require('./routers/api/favorite')
 
+// comment
+const comment = require('./routers/api/comment')
+
 // 创建 application/x-www-form-urlencoded 编码解析
 app.use(bodyParser.urlencoded({ extended: false }))  
 // parse application/json  
@@ -66,6 +69,7 @@ app.use('/api/tag', tag)
 app.use('/api/follow', follow)
 app.use('/api/praise', praise)
 app.use('/api/favorite', favorite)
+app.use('/api/comment', comment)
 
 const server = app.listen(3000, ()=> {
   let host = server.address().address
