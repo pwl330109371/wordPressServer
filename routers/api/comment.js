@@ -36,7 +36,8 @@ router.post('/add', passport.authenticate('jwt', {session: false}), (req, res) =
 // @desc 获取所有的信息
 // @access Private
 router.get('/list', (req, res) => {
-    Comment.find().sort({'date':-1})
+    const articleId = req.query.articleId
+    Comment.find({articleId: articleId}).sort({'date':-1})
     .then(tags => {
       if(!tags) {
         return res.status(404)
