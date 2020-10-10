@@ -49,6 +49,17 @@ router.post('/register', (req, res) => {
       })
 })
 
+// route POST apo/users/list
+// @desc 返回token jwt passport
+// @access public
+router.get('/list',(req, res) => {
+  User.find({}).then((user) => {
+    res.json({
+      data:user
+    })
+  })
+})
+
 // route POST apo/users/logon
 // @desc 返回token jwt passport
 // @access public
