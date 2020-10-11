@@ -64,12 +64,29 @@ router.get('/list',(req, res) => {
 // @desc 返回token jwt passport
 // @access public
 router.delete('/delete/:id',(req, res) => {
-  User.findByIdAndRemove({_id:req.params.id})
-    .then(user => {
-      User.save().then(user => res.json(user))
-      res.status(200).json(user)
-    })
-    .catch(err => res.status(404).json('删除失败'))
+  console.log(111);
+  console.log(req.params.id);
+  User.findByIdAndRemove(req.params.id, function(err, data){
+      if (err) {
+          res.status(200).json({
+            msg:'删除失败',
+            code: 201
+          })
+      }
+      else {
+        res.status(200).json({
+          msg:'操作成功',
+          code: 200
+        })
+      }
+  })
+  // User.findOneAndDelete({_id:req.params.id})
+  //   .then((user) => {
+  //     console.log(user);
+  //     User.save().then(user => res.json(user))
+  //     res.status(200).json(user)
+  //   })
+  //   .catch(err => res.status(404).json('删除失败'))
 })
 
 // route POST apo/users/logon
