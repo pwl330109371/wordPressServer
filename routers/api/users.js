@@ -64,8 +64,9 @@ router.get('/list',(req, res) => {
 // @desc 返回token jwt passport
 // @access public
 router.post('/login', (req, res) => {
-  const name = req.body.name
-  const password = req.body.password
+  
+  const name = req.body.name || req.query.name
+  const password = req.body.password || req.query.password
   // 查询数据库
   User.findOne({name})
       .then((user) => {
