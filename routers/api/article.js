@@ -149,12 +149,20 @@ router.get('/getDetail', (req, res) => {
 // @access Private
 router.delete('/delete/:id', passport.authenticate('jwt', {session: false}), (req, res) => {
   const userId = req.user.id
-  Article.findByIdAndRemove({_id:req.params.id})
-    .then(acticle => {
-      acticle.save().then(acticle => res.json(acticle))
-      res.status(200).json(acticle)
-    })
-    .catch(err => res.status(404).json('删除失败'))
+    Article.findByIdAndRemove(req.params.id, function(err, data){
+      if (err) {
+          res.status(200).json({
+            msg:'删除失败',
+            code: 201
+          })
+      }
+      else {
+        res.status(200).json({
+          msg:'操作成功',
+          code: 200
+        })
+      }
+  })
 })
 
 // route DELETE apo/acticle/delete
