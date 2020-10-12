@@ -1,3 +1,10 @@
+/*
+ * @文件描述: 文件描述
+ * @作者: pwl
+ * @Date: 2020-09-25
+ * @LastEditors: pwl
+ * @LastEditTime: 2020-10-12
+ */
 const express = require('express')
 
 const router = express.Router()
@@ -34,8 +41,8 @@ router.post('/add', passport.authenticate('jwt', {session: false}), (req, res) =
 // @access Private
 router.post('/addChild', passport.authenticate('jwt', {session: false}), (req, res) => {
   const tags = {};
-  if (req.body.name) tags.name = req.body.name
-  if (req.body._personId) tags._personId = req.body._personId
+  if (req.body.name) tags.name = req.body.name || req.query.name
+  if (req.body._personId) tags._personId = req.body._personId || req.query._personId
   new TagChild(tags).save().then(tag => {
     res.json(tag)
   })
