@@ -67,17 +67,14 @@ router.put('/edit', passport.authenticate('jwt', {session: false}), (req, res) =
 router.post('/list', (req, res) => {
   let pageSize = req.body.pageSize || 20  // 分页参数
   let currentPage = req.body.currentPage || 1 // 当前的页码
-  let params = {
-    // 查询条件参数
-    keyword: req.body.keyword,
-    tag: req.body.tag
-  }
-  let mp = {}
-  for (let i in params) {
-    if(params[i] != undefined) {
-      mp[i] = params[i]
-    }
-  }
+  let keyword = req.body.keyword || ''
+  // let mp = {}
+  // for (let i in params) {
+  //   if(params[i] != undefined) {
+  //     mp[i] = params[i]
+  //   }
+  // }
+  const reg = new RegExp(keyword, 'i')
   Article.find()
     .then(acticle => {
       if(!acticle) {
@@ -85,7 +82,7 @@ router.post('/list', (req, res) => {
       }
       let count = acticle.length // 数量总长度
       console.log('count', count)
-      Article.find({...mp}).sort({'date':-1}).skip((parseInt(currentPage)-1)*parseInt(pageSize)).limit(parseInt(pageSize)).exec((err, docs) => {
+      Article.find({$or:[{'title': reg}]}).sort({'date':-1}).skip((parseInt(currentPage)-1)*parseInt(pageSize)).limit(parseInt(pageSize)).exec((err, docs) => {
         if (err) {
           return res.status(200).json({state: 1,msg: '请求失败'})
         }
@@ -112,8 +109,6 @@ router.get('/detail',passport.authenticate('jwt', {session: false}), (req, res) 
       // Article.updateOne({_id: req.query.id}, {count:count}, (err, data) => {
       //   console.log(data);
       // })
-      console.log(acticle.authorInfo.id);
-
       Follow.find({userId: acticle.authorInfo.id}).then((data) => {
         if (data.length > 0 && data != null) {
           let userId = req.user.id
@@ -148,7 +143,6 @@ router.get('/getDetail', (req, res) => {
 // @desc 获取单个的信息
 // @access Private
 router.delete('/delete/:id', passport.authenticate('jwt', {session: false}), (req, res) => {
-  const userId = req.user.id
     Article.findByIdAndRemove(req.params.id, function(err, data){
       if (err) {
           res.status(200).json({
